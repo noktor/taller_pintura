@@ -54,10 +54,12 @@ function onReady(){
 			if($this.prop('checked') === false){
 				$check_total.prop('checked',false);
 		//		console.log($check_total);
-			} else {
-				$check_total.prop('checked',true);
 			}
-
+			$checkbox.each(function(){
+				if($(this).prop('checked') && $(this).val()!='tot'){
+					$check_total.prop('checked',false);
+				}
+			});
 		}
 		calcularTotal();
 	});
