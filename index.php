@@ -2,105 +2,112 @@
 	include "FirePHPCore/fb.php";
 
 	$llista_porcions = array(
-							array(
+		 'aleta_Frontal_D'=>array(
 								'id'=>01,
-								'nom'=>'aleta_Frontal_D',
+								'nom'=>'Aleta Frontal Dreta',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>115
 							),
-							array(
+		'retrovisor_Dreta'=>array(
 								'id'=>02,
-								'nom'=>'retrovisor_Dreta',
+								'nom'=>'Retrovisor Dreta',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>31
 							),
-							array(
+		 'porta_Frontal_D'=>array(
 								'id'=>03,
-								'nom'=>'porta_Frontal_D',
+								'nom'=>'Porta Frontal Dreta',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>105
 							),
-							array(
+		'porta_Anterior_D'=>array(
 								'id'=>04,
-								'nom'=>'porta_Anterior_D',
+								'nom'=>'Porta Anterior Dreta',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>105
 							),
-							array(
+		'aleta_Anterior_D'=>array(
 								'id'=>05,
-								'nom'=>'aleta_Anterior_D',
+								'nom'=>'Aleta Anterior Dreta',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>115
 							),
-							array(
+	   'paraxocs_Anterior'=>array(
 								'id'=>06,
-								'nom'=>'paraxocs_Anterior',
+								'nom'=>'Paraxocs Anterior',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>125
 							),
-							array(
+				 'malater'=>array(
 								'id'=>07,
-								'nom'=>'malater',
+								'nom'=>'Malater',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>135
 							),
-							array(
+		'aleta_Anterior_E'=>array(
 								'id'=>08,
-								'nom'=>'aleta_Anterior_E',
+								'nom'=>'Aleta Anterior Esquerra',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>115
 							),
-							array(
+		'porta_Anterior_E'=>array(
 								'id'=>09,
-								'nom'=>'porta_Anterior_E',
+								'nom'=>'Porta Anterior Esquerra',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>105
 							),
-							array(
+		 'porta_Frontal_E'=>array(
 								'id'=>10,
-								'nom'=>'porta_Frontal_E',
+								'nom'=>'Porta Frontal Esquerra',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>105
 							),
-							array(
+	 'retrovisor_Esquerra'=>array(
 								'id'=>11,
-								'nom'=>'retrovisor_Esquerra',
+								'nom'=>'Retrovisor Esquerra',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>31
 							),
-							array(
+		 'aleta_Frontal_E'=>array(
 								'id'=>12,
-								'nom'=>'aleta_Frontal_E',
+								'nom'=>'Aleta Frontal Esquerra',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>115
 							),
-							array(
+		'paraxocs_Frontal'=>array(
 								'id'=>13,
-								'nom'=>'paraxocs_Frontal',
+								'nom'=>'Paraxocs Frontal',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>125
 							),
-							array(
+		    'tapa_Frontal'=>array(
 								'id'=>14,
-								'nom'=>'tapa_Frontal',
+								'nom'=>'Tapa Frontal',
 								'descripcio'=>'',
-								'preu'=>20000
+								'preu'=>155
 							),
-							array(
+				  'sostre'=>array(
 								'id'=>15,
-								'nom'=>'sostre',
+								'nom'=>'Sostre',
 								'descripcio'=>'',
-								'preu'=>20000
-							)																														
+								'preu'=>178
+							),
+				  'tot'=>array(
+								'id'=>16,
+								'nom'=>'Tot el cotxe',
+								'descripcio'=>'',
+								'preu'=>1375
+							)																																				
 						);
-	echo "<pre>";
-	print_r($llista_porcions);
-	echo "</pre>";
+	//echo "<pre>";
+	//print_r($llista_porcions);
+	//echo "</pre>";
 	FB::send("test");
 ?>
 
 <html>
 	<head>
+		<meta charset="UTF-8">		
 		<title>Taller de Pintura</title>
 		<link rel="stylesheet/less" type="text/css" href="css/style.less" />
 		<script src="js/less-1.5.0.min.js" type="text/javascript"></script>
@@ -115,14 +122,14 @@
 			<div id="porcio_porta_Frontal_D" class="porcio" data-id="porta_Frontal_D"></div>
 			<div id="porcio_porta_Anterior_D" class="porcio" data-id="porta_Anterior_D"></div>
 			<div id="porcio_aleta_Anterior_D" class="porcio" data-id="aleta_Anterior_D"></div>	
-			<div id="porcio_paraxocs_Anterior" class="porcio" data-id="paraxocs_Anterior"><h5>Paraxocs Anterior</h5></div>
+			<div id="porcio_paraxocs_Anterior" class="porcio" data-id="paraxocs_Anterior"><h5><?php echo "<b>".$llista_porcions['paraxocs_Anterior']['nom']."</b>";?></h5></div>
 			<div id="porcio_malater" class="porcio" data-id="malater"></div>
 			<div id="porcio_aleta_Anterior_E" class="porcio" data-id="aleta_Anterior_E"></div>
 			<div id="porcio_porta_Anterior_E" class="porcio" data-id="porta_Anterior_E"></div>
 			<div id="porcio_porta_Frontal_E" class="porcio" data-id="porta_Frontal_E"></div>
 			<div id="porcio_retrovisor_Esquerra" class="porcio" data-id="retrovisor_Esquerra"></div>
 			<div id="porcio_aleta_Frontal_E" class="porcio" data-id="aleta_Frontal_E"></div>
-			<div id="porcio_paraxocs_Frontal" class="porcio" data-id="paraxocs_Frontal"><h5>Paraxocs Frontal</h5></div>
+			<div id="porcio_paraxocs_Frontal" class="porcio" data-id="paraxocs_Frontal"><h5><?php echo "<b>".$llista_porcions['paraxocs_Frontal']['nom']."</b>";?></h5></div>
 			<div id="porcio_tapa_Frontal" class="porcio" data-id="tapa_Frontal"></div>
 			<div id="porcio_sostre" class="porcio" data-id="sostre"></div>													
 		</div>
@@ -130,26 +137,28 @@
 			<form>
 				<table>
 					<td>
-						<input type="checkbox" name="porcio_cotxe" value="paraxocs_Frontal"> Paraxocs Frontal<br>
-						<input type="checkbox" name="porcio_cotxe" value="aleta_Frontal_E"> Aleta Frontal Esquerra<br>
-						<input type="checkbox" name="porcio_cotxe" value="retrovisor_Esquerra"> Retovisor Esquerra<br>
-						<input type="checkbox" name="porcio_cotxe" value="porta_Frontal_E"> Porta Frontal Esquerra<br>
-						<input type="checkbox" name="porcio_cotxe" value="porta_Anterior_E"> Porta Anterior Esquerra<br>
-						<input type="checkbox" name="porcio_cotxe" value="aleta_Anterior_E"> Aleta Anterior Esquerra<br>
-						<input type="checkbox" name="porcio_cotxe" value="paraxocs_Anterior"> Paraxocs Anterior<br>																								
-						<input type="checkbox" name="porcio_cotxe" value="malater"> Malater<br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['paraxocs_Frontal']['preu']; ?>" value="paraxocs_Frontal"> <?php echo $llista_porcions['paraxocs_Frontal']['nom'].": <b>".$llista_porcions['paraxocs_Frontal']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['aleta_Frontal_E']['preu']; ?>" value="aleta_Frontal_E"> <?php echo $llista_porcions['aleta_Frontal_E']['nom'].": <b>".$llista_porcions['aleta_Frontal_E']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['retrovisor_Esquerra']['preu']; ?>" value="retrovisor_Esquerra"> <?php echo $llista_porcions['retrovisor_Esquerra']['nom'].": <b>".$llista_porcions['retrovisor_Esquerra']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['porta_Frontal_E']['preu']; ?>" value="porta_Frontal_E"> <?php echo $llista_porcions['porta_Frontal_E']['nom'].": <b>".$llista_porcions['porta_Frontal_E']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['porta_Anterior_E']['preu']; ?>" value="porta_Anterior_E"> <?php echo $llista_porcions['porta_Anterior_E']['nom'].": <b>".$llista_porcions['porta_Anterior_E']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['aleta_Anterior_E']['preu']; ?>" value="aleta_Anterior_E"> <?php echo $llista_porcions['aleta_Anterior_E']['nom'].": <b>".$llista_porcions['aleta_Anterior_E']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['paraxocs_Anterior']['preu']; ?>" value="paraxocs_Anterior"> <?php echo $llista_porcions['paraxocs_Anterior']['nom'].": <b>".$llista_porcions['paraxocs_Anterior']['preu']." &euro;</b>";?><br>																							
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['malater']['preu']; ?>" value="malater"> <?php echo $llista_porcions['malater']['nom'].": <b>".$llista_porcions['malater']['preu']." &euro;</b>";?><br>
 					</td>
 					<td>
-						<input type="checkbox" name="porcio_cotxe" value="aleta_Anterior_D"> Aleta Anterior Dreta<br>
-						<input type="checkbox" name="porcio_cotxe" value="porta_Anterior_D"> Porta Anterior Dreta<br>
-						<input type="checkbox" name="porcio_cotxe" value="porta_Frontal_D"> Porta Frontal Dreta<br>																								
-						<input type="checkbox" name="porcio_cotxe" value="retrovisor_Dreta"> Retrovisor Dreta<br>
-						<input type="checkbox" name="porcio_cotxe" value="aleta_Frontal_D"> Aleta Frontal Dreta<br>
-						<input type="checkbox" name="porcio_cotxe" value="tapa_Frontal"> Tapa Frontal<br>
-						<input type="checkbox" name="porcio_cotxe" value="sostre"> Sostre<br>																								
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['aleta_Anterior_D']['preu']; ?>" value="aleta_Anterior_D"> <?php echo $llista_porcions['aleta_Anterior_D']['nom'].": <b>".$llista_porcions['aleta_Anterior_D']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['porta_Anterior_D']['preu']; ?>" value="porta_Anterior_D"> <?php echo $llista_porcions['porta_Anterior_D']['nom'].": <b>".$llista_porcions['porta_Anterior_D']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['porta_Frontal_D']['preu']; ?>" value="porta_Frontal_D"> <?php echo $llista_porcions['porta_Frontal_D']['nom'].": <b>".$llista_porcions['porta_Frontal_D']['preu']." &euro;</b>";?><br>																								
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['retrovisor_Dreta']['preu']; ?>" value="retrovisor_Dreta"> <?php echo $llista_porcions['retrovisor_Dreta']['nom'].": <b>".$llista_porcions['retrovisor_Dreta']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['aleta_Frontal_D']['preu']; ?>" value="aleta_Frontal_D"> <?php echo $llista_porcions['aleta_Frontal_D']['nom'].": <b>".$llista_porcions['aleta_Frontal_D']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['tapa_Frontal']['preu']; ?>" value="tapa_Frontal"> <?php echo $llista_porcions['tapa_Frontal']['nom'].": <b>".$llista_porcions['tapa_Frontal']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['sostre']['preu']; ?>" value="sostre"> <?php echo $llista_porcions['sostre']['nom'].": <b>".$llista_porcions['sostre']['preu']." &euro;</b>";?><br><br>
+						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['tot']['preu']; ?>" value="tot"> <?php echo "<b>".$llista_porcions['tot']['nom'].": ".$llista_porcions['tot']['preu']." &euro;</b>";?><br>																														
 					</td>
 				</table>
 			</form>
 		</div>
+		<span id="total"><b>Total: 0 &euro;</b></span>
 	</body>
 </html>
