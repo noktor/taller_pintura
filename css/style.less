@@ -14,94 +14,126 @@
 	width:400;
 	height:215;
 	background-repeat: no-repeat;
-	#aleta_frontal_dreta{
+	#porcio_aleta_Frontal_D{
 		width:125px;
 		height:50px;
 	}
-	#retrovisor_dret{
+	#porcio_retrovisor_Dreta{
 		left:126px;
 		width:30px;
 		height:50px;	
 	}
-	#porta_frontal_dreta{
+	#porcio_porta_Frontal_D{
 		left:157px;
 		width:90px;
 		height:50px;
 	}
-	#porta_anterior_dreta{
+	#porcio_porta_Anterior_D{
 		left:248px;
 		width:90px;
 		height:50px;	
 	}
-	#aleta_anterior_dreta{
+	#porcio_aleta_Anterior_D{
 		left:339px;
-		width:50px;
+		width:60px;
 		height:50px;		
 	}
-	#paraxocs_anterior{
+	#porcio_paraxocs_Anterior{
 		top:51px;		
 		left:369px;
-		width:20px;
+		width:30px;
 		height:115px;
+		h5{
+			position:relative;
+			top:22px;
+			font-size:10px;
+			-webkit-transform: rotate(90deg);
+			-moz-transform: rotate(90deg);
+			-o-transform: rotate(90deg);
+		}			
 	}
-	#malater{
+	#porcio_malater{
 		top:51px;		
 		left:318px;
 		width:50px;
 		height:115px;		
 	}
-	#aleta_anterior_esquerra{
+	#porcio_aleta_Anterior_E{
 		top:167px;
 		left:339px;
-		width:50px;
+		width:60px;
 		height:50px;
 	}
-	#porta_anterior_esquerra{
+	#porcio_porta_Anterior_E{
 		top:167px;		
 		left:248px;
 		width:90px;
 		height:50px;
 	}
-	#porta_frontal_esquerra{
+	#porcio_porta_Frontal_E{
 		top:167px;		
 		left:157px;
 		width:90px;
 		height:50px;		
 	}
-	#retrovisor_esquerra{
+	#porcio_retrovisor_Esquerra{
 		top:167px;			
 		left:126px;
 		width:30px;
 		height:50px;		
 	}
-	#aleta_frontal_esquerra{		
+	#porcio_aleta_Frontal_E{		
 		top:167px;
 		width:125px;
 		height:50px;
 	}
-	#paraxocs_frontal{
+	#porcio_paraxocs_Frontal{
 		top:51px;		
 		width:20px;
-		height:115px;	
+		height:115px;
+		h5{
+			position:relative;
+			top:40px;
+			font-size:10px;
+			-webkit-transform: rotate(-90deg);
+			-moz-transform: rotate(-90deg);
+			-o-transform: rotate(-90deg);
+		}	
 	}
-	#tapa_frontal{
+	#porcio_tapa_Frontal{
 		top:51px;
 		left:21px;	
 		width:80px;
 		height:115px;	
 	}
-	#sostre{
+	#porcio_sostre{
 		top:51px;
 		left:175px;	
 		width:142px;
 		height:115px;		
 	}
-	.porcio{
 
+	@color_porcio: cyan;
+	.porcio{
+		color:red;
+		background-color: @color_porcio;
+		border:solid @color_porcio - 300;
+		position:absolute;		
+		.opacity(0.4);
 		&:hover{	
-				background-color: cyan;
+				background-color: @color_porcio - 250;
 				.opacity(0.4);
 		}
-		position:absolute;	
+		&:active,&.porcio_activa{	
+				background-color: @color_porcio - 250;
+				.opacity(0.4);
+		}				
+	
 	}
+}
+
+#formulari{
+	top:400px;
+	left:20%;
+	position:absolute;
 }
