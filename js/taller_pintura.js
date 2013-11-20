@@ -10,19 +10,21 @@ function onReady(){
 	var $check_total = $("input[value='tot']");
 	$porcio.on('click', function(){
 		var $this = $(this);
-		var total = $total.data('total');
+	//	var total = $total.data('total');
 		var data = $this.data('id');
 		var $selector = $('input[value="'+data+'"]');
 		console.log($this);
 		if($this.hasClass('porcio_activa')){
 			$this.removeClass('porcio_activa');
 			$selector.prop('checked',false);
-			total -= $selector.data('preu');
+			$check_total.prop('checked',false);
+		//	total -= $selector.data('preu');
 		} else {
 		    $this.addClass('porcio_activa');
 			$selector.prop('checked',true);
-			total += $selector.data('preu');			
+		//	total += $selector.data('preu');			
 		}
+		marcar_CB_Total();		
 		calcularTotal();
 	});
 
@@ -55,11 +57,7 @@ function onReady(){
 				$check_total.prop('checked',false);
 		//		console.log($check_total);
 			}
-			$checkbox.each(function(){
-				if($(this).prop('checked') && $(this).val()!='tot'){
-					$check_total.prop('checked',false);
-				}
-			});
+			marcar_CB_Total();
 		}
 		calcularTotal();
 	});
@@ -70,12 +68,25 @@ function onReady(){
 		if($check_total.prop('checked') === true){
 			total += $check_total.data('preu');
 		} else {
-		$checkbox.each(function(){
-			if($(this).prop('checked') && $(this).val()!='tot'){
-				total += $(this).data('preu');
-			}
-		});
+			$checkbox.each(function(){
+				if($(this).prop('checked') && $(this).val()!='tot'){
+					total += $(this).data('preu');
+				}
+			});
 		}
 		$total.html("<b>Total: "+total+" &euro;</b>");
+	}
+
+	function marcar_CB_Total(){
+		console.log($("#formulari input:checkbox:checked").length);
+		
+		if($porcio.hasClass('porcio_activa').length == 15){
+			$check_total.prop('checked',true);
+		}
+
+		//if ($("#formulari input:checkbox:checked").length == 15){
+		if($checkbox.filter(':checked').length == 15){
+			$check_total.prop('checked',true);
+		}
 	}
 }

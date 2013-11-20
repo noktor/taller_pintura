@@ -102,7 +102,7 @@
 	//echo "<pre>";
 	//print_r($llista_porcions);
 	//echo "</pre>";
-	FB::send("test");
+	//FB::send("test");
 ?>
 
 <html>
