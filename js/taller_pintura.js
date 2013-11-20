@@ -74,6 +74,8 @@ function onReady(){
 				}
 			});
 		}
+		$("#contacte").find("#total_amagat").val(total);		
+		console.log("preu actual: "+$("#contacte").find("#total_amagat").val()+" €");
 		$total.html("<b>Total: "+total+" &euro;</b>");
 	}
 
