@@ -8,6 +8,7 @@
 	include "FirePHPCore/fb.php";
 	include "validate.php";
 	include "errors.php";
+	include "flash.php";
 
 	$llista_porcions = array(
 		 'aleta_Frontal_D'=>array(
@@ -46,9 +47,9 @@
 								'descripcio'=>'',
 								'preu'=>125
 							),
-				 'malater'=>array(
+				 'maleter'=>array(
 								'id'=>07,
-								'nom'=>'Malater',
+								'nom'=>'Maleter',
 								'descripcio'=>'',
 								'preu'=>135
 							),
@@ -112,71 +113,160 @@
 	//echo "</pre>";
 	//FB::send("test");
 $llista_errors = new Errors();
+//$llista_errors->accumulate = true;
+
 if(isset($_POST["submit"])){
-	if(isset($_POST["nom"]) && isset($_POST["cognoms"]) && isset($_POST["telefon"]) && isset($_POST["email"]) && isset($_POST["condicions"])){
+
+	if( !isset($_POST["condicions"]) ){
+		$llista_errors->add_public("Les condicions d'ús s'han d'acceptar.","condicions");
+	}
+	else if (!isset($_POST["porcio_cotxe"])){
+		$llista_errors->add_public("Has d'escollir alguna porcio per a pintar.","checkboxes");
+	} 
+	else if( isset($_POST["nom"]) && isset($_POST["cognoms"]) && isset($_POST["telefon"]) && isset($_POST["email"])){
+
 		$nom=$_POST['nom'];
 		$cognoms=$_POST['cognoms'];
 		$telefon=$_POST['telefon'];
 		$email=$_POST['email'];
-		$total=$_POST['total_amagat'];
+		$data_valid = array();
+
 		if(Validate::is_empty($nom)){
-		//	FB::send("Com et dius?");
+		//	comprobar que no ha deixat el camp del nom buit
 			$llista_errors->add_public("El nom és obligatori.","nom");
 		} else {
-			FB::send("Nom: ".$_POST["nom"]);	
+		//	nom introduït correcte
+			FB::send("Nom: ".$_POST["nom"]);
+			$data_valid['nom'] = trim($nom);
 		}
+
 		if(Validate::is_empty($cognoms)){
-		//	FB::send("I els cognoms?");
+		//	el camp dels cognoms és obligatori
 			$llista_errors->add_public("Els cognoms són obligatoris","cognoms");
 		} else {
 			FB::send("Cognoms: ".$_POST["cognoms"]);	
+			$data_valid['cognoms'] = trim($cognoms);
 		}
-		if(!Validate::is_empty($telefon)){
-			if(Validate::is_number($telefon)){
-				FB::send("Telèfon: ".$_POST["telefon"]);
-			} else {
-			//	FB::send("Telèfon incorrecte!");
-				$llista_errors->add_public("Format de telèfo incorrecte.","telefon");				
-			}			
-			//$llista_errors->add-public("Com et dius?","nom");
-		} else {
-		//	FB::send("Digue'ns el teu telèfon?");
-			$llista_errors->add_public("El telèfon és obligatori.","telefon");			
-		}
-		if(!Validate::is_empty($email)){
 
-			//$llista_errors->add-public("Com et dius?","nom");
-			if(Validate::is_email($email)){
-				FB::send("E-mail: ".$_POST["email"]);	
-			} else {
-			//	FB::send("Email incorrecte!");
-				$llista_errors->add_public("Format d'e-mail incorrecte.","email");
+		if( Validate::is_empty($telefon)){
+			$llista_errors->add_public("El telèfon és obligatori.","telefon");				
+		}
+		else if(!Validate::is_number($telefon)){
+			$llista_errors->add_public("Format de telèfon incorrecte.","telefon");
+		}
+		else
+		{
+			//	telèfon correcte
+			FB::send("Telèfon: ".$_POST["telefon"]);
+			$data_valid['telefon'] = trim($telefon);
+		}
+
+
+		if( Validate::is_empty($email)){
+			$llista_errors->add_public("L'e-mail és obligatori.","email");
+		}
+		else if(!Validate::is_email($email)){
+			$llista_errors->add_public("Format d'e-mail incorrecte.","email");
+		}
+		else
+		{
+			//	mail introduït correctament
+			FB::send("E-mail: ".$_POST["email"]);
+			$data_valid['email'] = trim($_POST['email']);
+		}
+
+		// Calcaular el total segons els checkbox que m'arriben
+		$total=0;
+
+		//modificar el foreach, actualment compta tots els checkboxes i els suma (incloent el total):
+		foreach ($_POST["porcio_cotxe"] AS $porcio)
+		{
+			if( isset($llista_porcions[$porcio]) )
+			{
+				$total+= $llista_porcions[ $porcio ]['preu'];
 			}
-		} else {
-		//	FB::send("Actualitza't, crea un email!");
-			$llista_errors->add_public("L'e-mail és obligatori.","email");						
+			else
+			{
+				$llista_errors->add_hypocritical( Errors::$str_please_redo, 'Hack attempt!!! Han passat el valor de porcio inexistent:"'.$porcio.'"');
+				break;
+			}
 		}
-		if($total!=0){
-		    FB::send("Total: ".$total);			
-		} else {
-			$llista_errors->add_public("Has de seleccionar alguna part del cotxe per pintar!","parts_a_pintar");
-		}
-	} else {
-		$llista_errors->add_public("Les condicions d'ús s'han d'acceptar.","condicions");
-		FB::send("Les condicions d'ús s'han d'acceptar.");
+
+		$data_valid['total'] = $total;
 	}
-	echo "<pre>";					
-	print_r($llista_errors->get_public());
-	echo "</pre>";	
-	if ($llista_errors->free() && isset($_POST['submit'])){
+	else
+	{
+		$llista_errors->add_hypocritical( Errors::$str_please_redo, 'No ha arribat cap variable $_POST.' );
+	}
+
+//	echo "<pre>";
+//	print_r($llista_errors->get_public());
+//	echo "</pre>";	
+	if(!isset($data_valid['nom'])){
+		$data_valid['nom']='sin nombre';
+	}
+	if(!isset($data_valid['teledon'])){
+		$data_valid['teledon']='sin telefono';
+	}
+	if(!isset($data_valid['email'])){
+		$data_valid['email']='sin email';
+	}
+	FB::send($data_valid['total']);
+	if ($llista_errors->free() ){
+		include "mandrill/Mandrill.php";
+		$options = array(
+					"html"=>'<b>Has recibido una nueva petición de contacto:<br><br>Nombre: '.$data_valid["nom"].'<br>Telefono: '.$data_valid["telefon"].'<br>E-mail: '.$data_valid["email"].'<br>Total a pagar: '.$data_valid["total"].' €</b>',
+					"subject"=>'Notificación nuevo presupuesto pintura.',
+					"from_email"=>$data_valid['email'],
+					"from_name"=>$data_valid['nom'],
+					"to"=>array(
+							array(
+								"email"=>'avilac4@gmail.com',
+								"name"=>'albert vila'
+								)
+							),
+					"track_opens"=>true,
+					"track_clicks"=>true
+					);
+
+		try
+		{
+			$mail = new Mandrill("74h-7Vh5dOfbfuJpd4c_tA");
+			$response = $mail->messages->send($options);
+			FB::send($response);
+		}
+		catch( Exception $e )
+		{
+			echo $e->getMessage();
+		}
 		FB::send("No hi ha cap error.");
 		//phpinfo();
 		//mail("avilac4@gmail.com","asuntillo","Este es el cuerpo del mensaje");
 		FB::send("Formulari enviat correctament.");
+	}
+	else{
+		//FB::send( $llista_errors->get_public() );
+		// Mostrar error al usuari
+
+		Flash::next('errors', $llista_errors->get_public() );
+		echo '<div class="alert alert-error">'.
+		'<ul>'; 
+		foreach( $llista_errors->get_public() AS $error )
+		{
+			echo '<li>'.$error.'</li>';
+		}
+		echo '</ul>'.
+		'</div>';
+
 	}		
-//	FB::send("Total: ".$_POST["total_amagat"]);	
+//	FB::send("Total: ".$_POST["total_amagat"]);
 	header("Location: index.php");
+
 } else {
+	
+//amb aquest else englobo tot el contingut de la pàgina:
+$missatge = Flash::get('errors');
+FB::send($missatge);
 ?>
 
 <html>
@@ -190,6 +280,7 @@ if(isset($_POST["submit"])){
 	</head>
 
 	<body>
+	<form class="form-horizontal" method="post">	
 		<div id="contenidor">
 			<div title="<?php echo $llista_porcions['aleta_Frontal_D']['nom'];?>" id="porcio_aleta_Frontal_D" class="porcio" data-id="aleta_Frontal_D"><h5><?php echo $llista_porcions['aleta_Frontal_D']['nom'];?></h5></div>
 			<div title="<?php echo $llista_porcions['retrovisor_Dreta']['nom'];?>" id="porcio_retrovisor_Dreta" class="porcio" data-id="retrovisor_Dreta"><h5><?php echo $llista_porcions['retrovisor_Dreta']['nom'];?></h5></div>
@@ -197,7 +288,7 @@ if(isset($_POST["submit"])){
 			<div title="<?php echo $llista_porcions['porta_Anterior_D']['nom'];?>" id="porcio_porta_Anterior_D" class="porcio" data-id="porta_Anterior_D"><h5><?php echo $llista_porcions['porta_Anterior_D']['nom'];?></h5></div>
 			<div title="<?php echo $llista_porcions['aleta_Anterior_D']['nom'];?>" id="porcio_aleta_Anterior_D" class="porcio" data-id="aleta_Anterior_D"><h5><?php echo $llista_porcions['aleta_Anterior_D']['nom'];?></h5></div>	
 			<div title="<?php echo $llista_porcions['paraxocs_Anterior']['nom'];?>" id="porcio_paraxocs_Anterior" class="porcio" data-id="paraxocs_Anterior"><h5><?php echo "<b>".$llista_porcions['paraxocs_Anterior']['nom']."</b>";?></h5></div>
-			<div title="<?php echo $llista_porcions['malater']['nom'];?>" id="porcio_malater" class="porcio" data-id="malater"><h5><?php echo $llista_porcions['malater']['nom'];?></h5></div>
+			<div title="<?php echo $llista_porcions['maleter']['nom'];?>" id="porcio_maleter" class="porcio" data-id="maleter"><h5><?php echo $llista_porcions['maleter']['nom'];?></h5></div>
 			<div title="<?php echo $llista_porcions['aleta_Anterior_E']['nom'];?>" id="porcio_aleta_Anterior_E" class="porcio" data-id="aleta_Anterior_E"><h5><?php echo $llista_porcions['aleta_Anterior_E']['nom'];?></h5></div>
 			<div title="<?php echo $llista_porcions['porta_Anterior_E']['nom'];?>" id="porcio_porta_Anterior_E" class="porcio" data-id="porta_Anterior_E"><h5><?php echo $llista_porcions['porta_Anterior_E']['nom'];?></h5></div>
 			<div title="<?php echo $llista_porcions['porta_Frontal_E']['nom'];?>" id="porcio_porta_Frontal_E" class="porcio" data-id="porta_Frontal_E"><h5><?php echo $llista_porcions['porta_Frontal_E']['nom'];?></h5></div>
@@ -208,69 +299,131 @@ if(isset($_POST["submit"])){
 			<div title="<?php echo $llista_porcions['sostre']['nom'];?>" id="porcio_sostre" class="porcio" data-id="sostre"><h5><?php echo $llista_porcions['sostre']['nom'];?></h5></div>													
 		</div>
 		<div id="formulari">
-			<form>
+			
 				<table>
 					<td>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['paraxocs_Frontal']['preu']; ?>" value="paraxocs_Frontal"> <?php echo $llista_porcions['paraxocs_Frontal']['nom'].": <b>".$llista_porcions['paraxocs_Frontal']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['aleta_Frontal_E']['preu']; ?>" value="aleta_Frontal_E"> <?php echo $llista_porcions['aleta_Frontal_E']['nom'].": <b>".$llista_porcions['aleta_Frontal_E']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['retrovisor_Esquerra']['preu']; ?>" value="retrovisor_Esquerra"> <?php echo $llista_porcions['retrovisor_Esquerra']['nom'].": <b>".$llista_porcions['retrovisor_Esquerra']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['porta_Frontal_E']['preu']; ?>" value="porta_Frontal_E"> <?php echo $llista_porcions['porta_Frontal_E']['nom'].": <b>".$llista_porcions['porta_Frontal_E']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['porta_Anterior_E']['preu']; ?>" value="porta_Anterior_E"> <?php echo $llista_porcions['porta_Anterior_E']['nom'].": <b>".$llista_porcions['porta_Anterior_E']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['aleta_Anterior_E']['preu']; ?>" value="aleta_Anterior_E"> <?php echo $llista_porcions['aleta_Anterior_E']['nom'].": <b>".$llista_porcions['aleta_Anterior_E']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['paraxocs_Anterior']['preu']; ?>" value="paraxocs_Anterior"> <?php echo $llista_porcions['paraxocs_Anterior']['nom'].": <b>".$llista_porcions['paraxocs_Anterior']['preu']." &euro;</b>";?><br>																							
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['malater']['preu']; ?>" value="malater"> <?php echo $llista_porcions['malater']['nom'].": <b>".$llista_porcions['malater']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['paraxocs_Frontal']['preu']; ?>" value="paraxocs_Frontal"> <?php echo $llista_porcions['paraxocs_Frontal']['nom'].": <b>".$llista_porcions['paraxocs_Frontal']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['aleta_Frontal_E']['preu']; ?>" value="aleta_Frontal_E"> <?php echo $llista_porcions['aleta_Frontal_E']['nom'].": <b>".$llista_porcions['aleta_Frontal_E']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['retrovisor_Esquerra']['preu']; ?>" value="retrovisor_Esquerra"> <?php echo $llista_porcions['retrovisor_Esquerra']['nom'].": <b>".$llista_porcions['retrovisor_Esquerra']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['porta_Frontal_E']['preu']; ?>" value="porta_Frontal_E"> <?php echo $llista_porcions['porta_Frontal_E']['nom'].": <b>".$llista_porcions['porta_Frontal_E']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['porta_Anterior_E']['preu']; ?>" value="porta_Anterior_E"> <?php echo $llista_porcions['porta_Anterior_E']['nom'].": <b>".$llista_porcions['porta_Anterior_E']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['aleta_Anterior_E']['preu']; ?>" value="aleta_Anterior_E"> <?php echo $llista_porcions['aleta_Anterior_E']['nom'].": <b>".$llista_porcions['aleta_Anterior_E']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['paraxocs_Anterior']['preu']; ?>" value="paraxocs_Anterior"> <?php echo $llista_porcions['paraxocs_Anterior']['nom'].": <b>".$llista_porcions['paraxocs_Anterior']['preu']." &euro;</b>";?><br>																							
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['maleter']['preu']; ?>" value="maleter"> <?php echo $llista_porcions['maleter']['nom'].": <b>".$llista_porcions['maleter']['preu']." &euro;</b>";?><br>
 					</td>
 					<td>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['aleta_Anterior_D']['preu']; ?>" value="aleta_Anterior_D"> <?php echo $llista_porcions['aleta_Anterior_D']['nom'].": <b>".$llista_porcions['aleta_Anterior_D']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['porta_Anterior_D']['preu']; ?>" value="porta_Anterior_D"> <?php echo $llista_porcions['porta_Anterior_D']['nom'].": <b>".$llista_porcions['porta_Anterior_D']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['porta_Frontal_D']['preu']; ?>" value="porta_Frontal_D"> <?php echo $llista_porcions['porta_Frontal_D']['nom'].": <b>".$llista_porcions['porta_Frontal_D']['preu']." &euro;</b>";?><br>																								
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['retrovisor_Dreta']['preu']; ?>" value="retrovisor_Dreta"> <?php echo $llista_porcions['retrovisor_Dreta']['nom'].": <b>".$llista_porcions['retrovisor_Dreta']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['aleta_Frontal_D']['preu']; ?>" value="aleta_Frontal_D"> <?php echo $llista_porcions['aleta_Frontal_D']['nom'].": <b>".$llista_porcions['aleta_Frontal_D']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['tapa_Frontal']['preu']; ?>" value="tapa_Frontal"> <?php echo $llista_porcions['tapa_Frontal']['nom'].": <b>".$llista_porcions['tapa_Frontal']['preu']." &euro;</b>";?><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['sostre']['preu']; ?>" value="sostre"> <?php echo $llista_porcions['sostre']['nom'].": <b>".$llista_porcions['sostre']['preu']." &euro;</b>";?><br><br>
-						<input type="checkbox" name="porcio_cotxe" data-preu="<?php echo $llista_porcions['tot']['preu']; ?>" value="tot"> <?php echo "<b>".$llista_porcions['tot']['nom'].": ".$llista_porcions['tot']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['aleta_Anterior_D']['preu']; ?>" value="aleta_Anterior_D"> <?php echo $llista_porcions['aleta_Anterior_D']['nom'].": <b>".$llista_porcions['aleta_Anterior_D']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['porta_Anterior_D']['preu']; ?>" value="porta_Anterior_D"> <?php echo $llista_porcions['porta_Anterior_D']['nom'].": <b>".$llista_porcions['porta_Anterior_D']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['porta_Frontal_D']['preu']; ?>" value="porta_Frontal_D"> <?php echo $llista_porcions['porta_Frontal_D']['nom'].": <b>".$llista_porcions['porta_Frontal_D']['preu']." &euro;</b>";?><br>																								
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['retrovisor_Dreta']['preu']; ?>" value="retrovisor_Dreta"> <?php echo $llista_porcions['retrovisor_Dreta']['nom'].": <b>".$llista_porcions['retrovisor_Dreta']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['aleta_Frontal_D']['preu']; ?>" value="aleta_Frontal_D"> <?php echo $llista_porcions['aleta_Frontal_D']['nom'].": <b>".$llista_porcions['aleta_Frontal_D']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['tapa_Frontal']['preu']; ?>" value="tapa_Frontal"> <?php echo $llista_porcions['tapa_Frontal']['nom'].": <b>".$llista_porcions['tapa_Frontal']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['sostre']['preu']; ?>" value="sostre"> <?php echo $llista_porcions['sostre']['nom'].": <b>".$llista_porcions['sostre']['preu']." &euro;</b>";?><br><br>
+						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['tot']['preu']; ?>" value="tot"> <?php echo "<b>".$llista_porcions['tot']['nom'].": ".$llista_porcions['tot']['preu']." &euro;</b>";?><br>
 					</td>
 				</table>
-			</form>
+			
 		</div>
 		<span id="total"><b>Total: 0 &euro;</b></span>
-		<form id="contacte" class="form-horizontal" method="post">
-		  <div class="control-group">
-		    <label class="control-label" for="inputName">Nom:</label>
-		    <div class="controls">
-		      <input type="text" id="inputName" name="nom" placeholder="Nom">
-		    </div>
-		  </div>
-		  <div class="control-group">
-		    <label class="control-label" for="inputSurname">Cognoms:</label>
-		    <div class="controls">
-		      <input type="text" id="inputSurname" name="cognoms" placeholder="Cognoms">
-		    </div>
-		  </div>		  
-		  <div class="control-group">
-		    <label class="control-label" for="inputPhone">Telèfon:</label>
-		    <div class="controls">
-		      <input type="text" id="inputPhone" name="telefon" placeholder="Telèfon">
-		    </div>
-		  </div>
-		  <div class="control-group">
-		    <label class="control-label" for="inputEmail">E-mail:</label>
-		    <div class="controls">
-		      <input type="text" id="inputEmail" name="email" placeholder="E-mail">
-		    </div>
-		  </div>
-		  		  
-		  <div class="control-group">
-		    <div class="controls">
-		      <label class="checkbox">
-		        <input type="checkbox" name="condicions"> Accepto les <a href="http://www.youtube.com" target="_blank">condicions d'ús</a> i la <a href="http://www.pumbao.com" target="_blank">Política de Privacitat.</a>
-		      </label>
-		      <button name="submit" type="submit" class="btn">Sign in</button>
-		    </div>
-		  </div>
-		<input type="hidden" id="total_amagat" name="total_amagat" value="0">
+			<div id="contacte">
+				<?php
+				$class = $span = $id = '';
+				if( isset($missatge['nom']) )
+				{
+					$id = 'inputError';
+					$class = ' error';
+					$span = '<span class="help-inline">'.$missatge['nom'].'</span>';
+				}
+				else
+				{
+					$id = "inputName";
+				}
+
+				?>
+				  <div class="control-group<?php echo $class;?>">
+				    <label class="control-label" for="<?php echo $id; ?>">Nom:</label>
+				    <div class="controls">
+				      <input type="text" id="<?php echo $id; ?>" name="nom" placeholder="Nom">
+				      <?php echo $span;?>
+				    </div>
+				  </div>
+				<?php
+				$class = $span = '';				
+				if( isset($missatge['cognoms']) )
+				{
+					$id = 'inputError';					
+					$class = ' error';
+					$span = '<span class="help-inline">'.$missatge['cognoms'].'</span>';
+				}
+				else
+				{
+					$id = "inputSurname";
+				}
+			
+				?>
+				  <div class="control-group<?php echo $class;?>">
+				    <label class="control-label" for="<?php echo $id; ?>">Cognoms:</label>
+				    <div class="controls">
+				      <input type="text" id="<?php echo $id; ?>" name="cognoms" placeholder="Cognoms">
+				      <?php echo $span;?>
+				    </div>
+				  </div>
+				<?php
+				$class = $span = '';				
+				if( isset($missatge['telefon']) )
+				{
+					$id = "inputError";
+					$class = ' error';
+					$span = '<span class="help-inline">'.$missatge['telefon'].'</span>';
+				}
+				else
+				{
+					$id = "inputPhone";
+				}
+				
+				?>		  		  
+				  <div class="control-group<?php echo $class;?>">
+				    <label class="control-label" for="<?php echo $id; ?>">Telèfon:</label>
+				    <div class="controls">
+				      <input type="text" id="<?php echo $id; ?>" name="telefon" placeholder="Telèfon">
+				      <?php echo $span;?>
+				    </div>
+				  </div>
+				<?php
+				$class = $span = '';				
+				if( isset($missatge['email']) )
+				{
+					$id = "inputError";
+					$class = ' error';
+					$span = '<span class="help-inline">'.$missatge['email'].'</span>';
+				}
+				else
+				{
+					$id = "inputEmail";
+				}
+
+				?>		  
+				  <div class="control-group<?php echo $class;?>">
+				    <label class="control-label" for="<?php echo $id; ?>">E-mail:</label>
+				    <div class="controls">
+				      <input type="text" id="<?php echo $id; ?>" name="email" placeholder="E-mail">
+				      <?php echo $span;?>
+				    </div>
+				  </div>  
+				  <div class="control-group">
+				    <div class="controls">
+				      <label class="checkbox">
+				        <input type="checkbox" name="condicions"> Accepto les <a href="http://www.google.com" target="_blank">condicions d'ús</a> i la <a href="http://www.sport.es" target="_blank">Política de Privacitat.</a>
+				      </label>
+				      <button name="submit" type="submit" class="btn">Sign in</button>
+				    </div>
+				  </div>
+				<input type="hidden" id="total_amagat" name="total_amagat" value="0">
+			</div>
 		</form>
 	</body>
 </html>
 <?php
+//tanco l'else if d'adalt.
+//IMPORTANT , guardar els clics?
 }

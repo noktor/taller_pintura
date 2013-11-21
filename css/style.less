@@ -1,12 +1,18 @@
 @import "bootstrap/bootstrap.less";
 
-
+.unselectable(@selectable: none) {
+        -moz-user-select: @selectable; 
+        -khtml-user-select: @selectable; 
+        -webkit-user-select: @selectable; 
+        -o-user-select: @selectable;
+}
 
 .bg-img(@img) {
 	background-image: url("../images/@{img}");
 }
 
 #contenidor{
+	.unselectable();
 	.bg-img("coche.jpg");
 	top:20%;
 	left:20%;
@@ -52,7 +58,7 @@
 			-o-transform: rotate(90deg);
 		}			
 	}
-	#porcio_malater{
+	#porcio_maleter{
 		top:51px;		
 		left:318px;
 		width:50px;
@@ -115,6 +121,7 @@
 
 	@color_porcio: cyan;
 	.porcio{
+		cursor:pointer;
 		color:red;
 		background-color: @color_porcio;
 		border:solid @color_porcio - 300;
@@ -149,3 +156,10 @@
 	left:20%;
 	position:absolute;
 }
+
+#errors{
+	top:200px;
+	left:40%;
+	position:absolute;
+}
+

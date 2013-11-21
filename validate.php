@@ -89,7 +89,7 @@ class Validate
 	*/
 	static public function is_number( $value, $decimal_char='.' )
 	{
-		$pattern = '/[0-9'."\\".$decimal_char.']+$/';
+		$pattern = "/[0-9\\.,]+$/";
 		return self::match( $value, $pattern );
 	}
 

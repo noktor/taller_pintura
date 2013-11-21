@@ -87,6 +87,7 @@ function onReady(){
 		}
 
 		//if ($("#formulari input:checkbox:checked").length == 15){
+//la sentència if de sota fa el mateix que la comentada adalt
 		if($checkbox.filter(':checked').length == 15){
 			$check_total.prop('checked',true);
 		}
