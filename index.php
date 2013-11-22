@@ -123,75 +123,62 @@ if(isset($_POST["submit"])){
 	else if (!isset($_POST["porcio_cotxe"])){
 		$llista_errors->add_public("Has d'escollir alguna porcio per a pintar.","checkboxes");
 	} 
-	else if( isset($_POST["nom"]) && isset($_POST["cognoms"]) && isset($_POST["telefon"]) && isset($_POST["email"])){
+	else if( isset($_POST["nom"]) && isset($_POST["telefon"]) && isset($_POST["email"])){
 
 		$nom=$_POST['nom'];
-		$cognoms=$_POST['cognoms'];
 		$telefon=$_POST['telefon'];
 		$email=$_POST['email'];
 		$data_valid = array();
 
-		if(Validate::is_empty($nom)){
-		//	comprobar que no ha deixat el camp del nom buit
-			$llista_errors->add_public("El nom és obligatori.","nom");
-		} else {
-		//	nom introduït correcte
-			FB::send("Nom: ".$_POST["nom"]);
-			$data_valid['nom'] = trim($nom);
-		}
+		if( Validate::is_empty($telefon) && Validate::is_empty($email)){
 
-		if(Validate::is_empty($cognoms)){
-		//	el camp dels cognoms és obligatori
-			$llista_errors->add_public("Els cognoms són obligatoris","cognoms");
-		} else {
-			FB::send("Cognoms: ".$_POST["cognoms"]);	
-			$data_valid['cognoms'] = trim($cognoms);
+			$llista_errors->add_public("Has d'indicar un telèfon o un email.");
 		}
-
-		if( Validate::is_empty($telefon)){
-			$llista_errors->add_public("El telèfon és obligatori.","telefon");				
-		}
-		else if(!Validate::is_number($telefon)){
+		else if( !Validate::is_empty($telefon) && !Validate::is_number($telefon) ){
 			$llista_errors->add_public("Format de telèfon incorrecte.","telefon");
 		}
-		else
-		{
-			//	telèfon correcte
-			FB::send("Telèfon: ".$_POST["telefon"]);
-			$data_valid['telefon'] = trim($telefon);
-		}
-
-
-		if( Validate::is_empty($email)){
-			$llista_errors->add_public("L'e-mail és obligatori.","email");
-		}
-		else if(!Validate::is_email($email)){
+		else if( !Validate::is_empty($email) && !Validate::is_email($email) ){
 			$llista_errors->add_public("Format d'e-mail incorrecte.","email");
 		}
 		else
 		{
-			//	mail introduït correctament
-			FB::send("E-mail: ".$_POST["email"]);
-			$data_valid['email'] = trim($_POST['email']);
+			//	telèfon correcte
+			//	mail introduït correctament		
+			FB::send("Nom: ".$nom);				
+			FB::send("Telèfon: ".$telefon);
+			FB::send("E-mail: ".$email);		
+			$data_valid['nom'] = trim($nom);				
+			$data_valid['telefon'] = trim($telefon);
+			$data_valid['email'] = trim($email);	
+			$data_valid['email_string'] = trim($email);
 		}
 
-		// Calcaular el total segons els checkbox que m'arriben
+		//DONECalcaular el total segons els checkbox que m'arriben
 		$total=0;
 
-		//modificar el foreach, actualment compta tots els checkboxes i els suma (incloent el total):
-		foreach ($_POST["porcio_cotxe"] AS $porcio)
+		//DONEmodificar el foreach, actualment compta tots els checkboxes i els suma (incloent el total):
+
+	//	$aux_llista_porcions = array_reverse($llista_porcions);
+	//	$aux_array_checkbox = array_reverse($_POST["porcio_cotxe"]);
+		if(isset($_POST['tot_cotxe'])){
+			$total = $llista_porcions['tot']['preu'];
+		}
+		else
 		{
-			if( isset($llista_porcions[$porcio]) )
+			foreach ($_POST["porcio_cotxe"] AS $porcio)
 			{
-				$total+= $llista_porcions[ $porcio ]['preu'];
-			}
-			else
-			{
-				$llista_errors->add_hypocritical( Errors::$str_please_redo, 'Hack attempt!!! Han passat el valor de porcio inexistent:"'.$porcio.'"');
-				break;
+				if( isset($llista_porcions[$porcio]))
+				{
+					$total += $llista_porcions[ $porcio ]['preu'];
+				//	FB::send($aux_llista_porcions[ $porcio ]['preu']." THIS MUST HAVE TO BE SEEN");
+				}
+				else
+				{
+					$llista_errors->add_hypocritical( Errors::$str_please_redo, 'Hack attempt!!! Han passat el valor de porcio inexistent:"'.$porcio.'"');
+					break;
+				}
 			}
 		}
-
 		$data_valid['total'] = $total;
 	}
 	else
@@ -202,20 +189,23 @@ if(isset($_POST["submit"])){
 //	echo "<pre>";
 //	print_r($llista_errors->get_public());
 //	echo "</pre>";	
-	if(!isset($data_valid['nom'])){
+	if( Validate::is_empty($data_valid['nom']) ){
 		$data_valid['nom']='sin nombre';
 	}
-	if(!isset($data_valid['teledon'])){
-		$data_valid['teledon']='sin telefono';
+	if( Validate::is_empty($data_valid['telefon']) ){
+		$data_valid['telefon']='sin telefono';
 	}
-	if(!isset($data_valid['email'])){
-		$data_valid['email']='sin email';
+	if( Validate::is_empty($data_valid['email']) ){
+		$data_valid['email'] = 'web@autologa.com';
+		$data_valid['email_string']='sin email';
 	}
 	FB::send($data_valid['total']);
 	if ($llista_errors->free() ){
 		include "mandrill/Mandrill.php";
 		$options = array(
-					"html"=>'<b>Has recibido una nueva petición de contacto:<br><br>Nombre: '.$data_valid["nom"].'<br>Telefono: '.$data_valid["telefon"].'<br>E-mail: '.$data_valid["email"].'<br>Total a pagar: '.$data_valid["total"].' €</b>',
+					"html"=>'<b>Has recibido una nueva petición de contacto:<br><br>Nombre: '.
+					$data_valid["nom"].'<br>Telefono: '.$data_valid["telefon"].'<br>E-mail: '.
+					$data_valid["email_string"].'<br>Total a pagar: '.$data_valid["total"].' €</b>',
 					"subject"=>'Notificación nuevo presupuesto pintura.',
 					"from_email"=>$data_valid['email'],
 					"from_name"=>$data_valid['nom'],
@@ -319,7 +309,7 @@ FB::send($missatge);
 						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['aleta_Frontal_D']['preu']; ?>" value="aleta_Frontal_D"> <?php echo $llista_porcions['aleta_Frontal_D']['nom'].": <b>".$llista_porcions['aleta_Frontal_D']['preu']." &euro;</b>";?><br>
 						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['tapa_Frontal']['preu']; ?>" value="tapa_Frontal"> <?php echo $llista_porcions['tapa_Frontal']['nom'].": <b>".$llista_porcions['tapa_Frontal']['preu']." &euro;</b>";?><br>
 						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['sostre']['preu']; ?>" value="sostre"> <?php echo $llista_porcions['sostre']['nom'].": <b>".$llista_porcions['sostre']['preu']." &euro;</b>";?><br><br>
-						<input type="checkbox" name="porcio_cotxe[]" data-preu="<?php echo $llista_porcions['tot']['preu']; ?>" value="tot"> <?php echo "<b>".$llista_porcions['tot']['nom'].": ".$llista_porcions['tot']['preu']." &euro;</b>";?><br>
+						<input type="checkbox" name="tot_cotxe" data-preu="<?php echo $llista_porcions['tot']['preu']; ?>" value="tot"> <?php echo "<b>".$llista_porcions['tot']['nom'].": ".$llista_porcions['tot']['preu']." &euro;</b>";?><br>
 					</td>
 				</table>
 			
@@ -344,27 +334,6 @@ FB::send($missatge);
 				    <label class="control-label" for="<?php echo $id; ?>">Nom:</label>
 				    <div class="controls">
 				      <input type="text" id="<?php echo $id; ?>" name="nom" placeholder="Nom">
-				      <?php echo $span;?>
-				    </div>
-				  </div>
-				<?php
-				$class = $span = '';				
-				if( isset($missatge['cognoms']) )
-				{
-					$id = 'inputError';					
-					$class = ' error';
-					$span = '<span class="help-inline">'.$missatge['cognoms'].'</span>';
-				}
-				else
-				{
-					$id = "inputSurname";
-				}
-			
-				?>
-				  <div class="control-group<?php echo $class;?>">
-				    <label class="control-label" for="<?php echo $id; ?>">Cognoms:</label>
-				    <div class="controls">
-				      <input type="text" id="<?php echo $id; ?>" name="cognoms" placeholder="Cognoms">
 				      <?php echo $span;?>
 				    </div>
 				  </div>
